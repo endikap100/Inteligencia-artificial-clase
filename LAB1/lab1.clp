@@ -9,17 +9,11 @@
     then
       (printout t -1 crlf)
     else
-      ;(printout t 1 crlf)
-
       (if (> ?b 0)
         then (printout t 1 crlf)
       else
         (printout t 0 crlf)
       )
-
-
-
-
   )
 )
 
