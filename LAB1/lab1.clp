@@ -63,5 +63,16 @@
 )
 
 ;7 cierto
+(deffunction cierto (?a)
+  (if (or (= 0 (str-compare ?a "si")) (= 0 (str-compare ?a "s")))
+    then
+      (printout t TRUE crlf)
+    else
+      (printout t FALSE crlf)
+  )
+)
 
 ;8 cierto2
+(deffunction cierto2 ()
+  (cierto (read) )
+)
