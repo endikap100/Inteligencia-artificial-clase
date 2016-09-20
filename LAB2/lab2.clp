@@ -88,6 +88,15 @@
 )
 
 ;9 multiplicarElemento
+(deffunction multiplicarElemento (?i $?a)
+  (bind $?re (create$ ))
+  (bind ?pos 1)
+  (progn$ (?e $?a)
+    (bind $?re (insert$ $?re ?pos (* ?i ?e)))
+    (bind ?pos (+ ?pos 1))
+  )
+  (return $?re)
+)
 
 ;10.1 factorialNormal
 (deffunction factorialNormal (?a)
