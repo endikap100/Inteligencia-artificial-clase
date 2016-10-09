@@ -1,0 +1,21 @@
+(deffunction EsMedio (?a)
+; Calcular inferior
+	(bind ?inferior=0)
+	(bind ?i=0)
+	(loop-for-count (- ?a 1)
+		(bind ?i(+ ?i 1))
+		(bind ?inferior(+ ?inferior ?i)
+		
+	)
+; Comprobar el superior
+	(bind ?i=(+ ?i 1))
+	(bind ?superior=0)
+	(while	(	(> ?inferior ?superior	)	)
+		(if (= ?inferior ?superior) 
+			then (return True)
+		
+		)
+		(bind ?superior(+ ?superior ?i) )
+		(bind ?i(+ ?i 1))
+	)
+)
