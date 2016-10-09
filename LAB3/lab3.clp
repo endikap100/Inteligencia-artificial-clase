@@ -234,3 +234,25 @@
  )
  (return ?num)
 )
+
+;14 esMedio
+(deffunction esMedio (?a)
+; Calcular inferior
+	(bind ?inferior 0)
+	(bind ?i 0)
+	(while (< ?i (- ?a 1))
+		(bind ?i(+ ?i 1))
+		(bind ?inferior(+ ?inferior ?i))
+	)
+; Comprobar el superior
+	(bind ?i (+ ?a 1))
+	(bind ?superior 0)
+	(while	(> ?inferior ?superior)
+		(bind ?superior(+ ?superior ?i) )
+		(bind ?i(+ ?i 1))
+	)
+	(if (= ?inferior ?superior)
+		then (return TRUE)
+		else (return FALSE)
+	)
+)
