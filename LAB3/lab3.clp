@@ -220,3 +220,17 @@
   )
   (return)
 )
+
+;13 num_magico
+(deffunction num_magico (?a)
+ (bind $?aMulti (num_to_multiCamp ?a))
+ (bind ?num ?a)
+ (while (not(= 1 (length$ ?aMulti)))
+  (bind ?num 0)
+  (progn$ (?e $?aMulti)
+    (bind ?num (+ ?num ?e))
+  )
+  (bind $?aMulti (num_to_multiCamp ?num))
+ )
+ (return ?num)
+)
