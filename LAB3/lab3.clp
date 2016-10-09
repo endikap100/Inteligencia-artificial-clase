@@ -194,10 +194,29 @@
 
 ;12.3 primeros_primos_y_capicua
 (deffunction primeros_primos_y_capicua (?a)
+  ;primos
   (bind ?i 0)
-  (while (< ?i ?a)
-    (if (num_primos ?i)
-      then (bind ?i (+ 1 ?i))
+  (bind ?c 0)
+  (printout t "Primeros primos:" crlf)
+  (while (< ?c ?a)
+    (if (eq True (num_primos ?i))
+      then
+        (printout t ?i crlf)
+        (bind ?c (+ 1 ?c))
     )
+    (bind ?i (+ 1 ?i))
   )
+  ;capicua
+  (bind ?i 0)
+  (bind ?c 0)
+  (printout t "Primeros capicua:" crlf)
+  (while (< ?c ?a)
+    (if (eq True (num_capicua ?i))
+      then
+        (printout t ?i crlf)
+        (bind ?c (+ 1 ?c))
+    )
+    (bind ?i (+ 1 ?i))
+  )
+  (return)
 )
