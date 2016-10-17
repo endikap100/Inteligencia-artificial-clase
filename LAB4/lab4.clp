@@ -1,8 +1,15 @@
+;cada estado esta compuesto por las dos habitaciones "H1" y "H2",
+;despues de cada uno de estos se representa si esta habitación esta sucia o limpia con "S" y " " respectivamente
+;a continuación se representa la ubicación de la aspiradora con una "A"
+;esta todo unido en un STRING
+;ejemplo "H1SAH2S ":
+;habitación 1 sucia y contiene la aspiradora
+;habitacion 2 sucia y no contiene aspiradora
+
 (defglobal ?*ESTADOINICIAL* = (create$ "H1SAH2S "))
-(defglobal ?*LISTA* = (create$ "H1SAH2S "))
-(defglobal ?*VISTOS* = (create$ "H1SAH2S "))
-(defglobal ?*PASOS-LIMITE* = 100)
-(defglobal ?*PASOS* = 0)
+(defglobal ?*LISTA* = ?*ESTADOINICIAL*)
+(defglobal ?*VISTOS* = ?*ESTADOINICIAL*)
+(defglobal ?*CAMINO* = ?*ESTADOINICIAL*)
 
 (deffunction get-aspiradora (?a)
   (bind ?pos (str-index "A" ?a))
@@ -44,5 +51,42 @@
 )
 
 (deffunction hijos (?a)
+  (bind $?hijos (create$ ))
+  ;aspirar
+  (bind $?hijos (insert$ $?hijos 1 (aspirar ?a)))
+  ;mover derecha
+  (bind $?hijos (insert$ $?hijos 1 (str-cat (sub-string 1 3 ?a) " " (sub-string 5 7 ?a) "A")))
+  ;mover izquierda
+  (bind $?hijos (insert$ $?hijos 1 (str-cat (sub-string 1 3 ?a) "A" (sub-string 5 7 ?a) " ")))
 
+  (return $?hijos)
+)
+
+(deffunction main ()
+  (while (not (= 0 (length$ ?*LISTA*)))
+    (bind ?first (nth$ 1 ?*LISTA*))
+    ;add camino
+    (bind ?caminoActual (nth$ 1 ?*CAMINO*))
+    (bind ?*CAMINO* (rest$ ?*CAMINO*))
+
+    ;(printout t ?first crlf)
+    (if (or (= 0 (str-compare ?first "H1 AH2  ")) (= 0 (str-compare ?first "H1  H2 A")))
+      then
+        (return ?caminoActual)
+    )
+    (bind ?*LISTA* (rest$ ?*LISTA*))
+    (bind $?hi (hijos ?first))
+    (progn$ (?e $?hi)
+
+
+      (if (eq FALSE (member$ ?e ?*VISTOS*))
+        then
+          (bind ?*LISTA* (insert$ ?*LISTA* 1 ?e))
+          (bind ?*VISTOS* (insert$ ?*VISTOS* 1 ?e))
+          (bind ?*CAMINO* (insert$ ?*CAMINO* 1 (str-cat ?caminoActual ", " ?e)))
+      )
+    )
+
+  )
+  (return FALSE)
 )
