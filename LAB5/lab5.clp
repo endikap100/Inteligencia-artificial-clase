@@ -1,4 +1,9 @@
 ;granjero, lechuga, cabra, puma
+; Tenemos un String en el que se representa el estado de las dos orillas
+; A es la orilla 1 y B es la orilla 2
+; Despues de la orilla se representan : granjero, lechuga, cabra, puma con lógica binaria
+;Ejemplo A1111B0000 Orilla 1 estan granjero, lechuga, cabra, puma orilla 2 no hay nadie.
+
 (defglobal ?*ESTADOINICIAL* = (create$ "A1111B0000"))
 (defglobal ?*LISTA* = ?*ESTADOINICIAL*)
 (defglobal ?*VISTOS* = ?*ESTADOINICIAL*)
@@ -38,7 +43,7 @@
   )
 )
 
-
+; Dandole un padre como parametro crea todos los hijos posibles para ese estado.
 (deffunction hijos (?a)
   (bind $?posibles (create$))
   (if (= 1 (ladogranjero ?a))
@@ -75,6 +80,7 @@
   (return $?posibles)
 )
 
+;Crea los hijos que son posibles dandole un estado padre como parametro
 (deffunction hijos_posibles (?a)
   (bind $?hijos (hijos ?a))
   (bind $?posibles (create$))
