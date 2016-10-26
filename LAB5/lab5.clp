@@ -41,9 +41,6 @@
 
 (deffunction hijos (?a)
   (bind $?posibles (create$))
-  ;
-  (printout t ?a crlf)
-  ;
   (if (= 1 (ladogranjero ?a))
     then
       (bind ?movgranjero (str-cat (sub-string 1 1 ?a) "0" (sub-string 3 6 ?a) "1" (sub-string 8 10 ?a)))
@@ -62,22 +59,19 @@
     else
       (bind ?movgranjero (str-cat (sub-string 1 1 ?a) "1" (sub-string 3 6 ?a) "0" (sub-string 8 10 ?a)))
       (bind $?posibles (insert$ $?posibles 1 ?movgranjero))
-      (if (= 1 (ladolechuga ?a))
+      (if (= 2 (ladolechuga ?a))
         then
           (bind $?posibles (insert$ $?posibles 1 (str-cat (sub-string 1 2 ?movgranjero) "1" (sub-string 4 7 ?movgranjero) "0" (sub-string 9 10 ?movgranjero))))
       )
-      (if (= 1 (ladocabra ?a))
+      (if (= 2 (ladocabra ?a))
         then
           (bind $?posibles (insert$ $?posibles 1 (str-cat (sub-string 1 3 ?movgranjero) "1" (sub-string 5 8 ?movgranjero) "0" (sub-string 10 10 ?movgranjero))))
       )
-      (if (= 1 (ladopuma ?a))
+      (if (= 2 (ladopuma ?a))
         then
           (bind $?posibles (insert$ $?posibles 1 (str-cat (sub-string 1 4 ?movgranjero) "1" (sub-string 6 9 ?movgranjero) "0")))
       )
   )
-  ;
-  (printout t $?posibles crlf)
-  ;
   (return $?posibles)
 )
 
@@ -109,11 +103,6 @@
     (bind ?caminoActual (nth$ 1 ?*CAMINO*))
     (bind ?*CAMINO* (rest$ ?*CAMINO*))
 
-    ;
-    (printout t ?caminoActual crlf)
-    ;
-
-    ;(printout t ?first crlf)
     (if (= 0 (str-compare ?first "A0000B1111"))
       then
         (return ?caminoActual)
