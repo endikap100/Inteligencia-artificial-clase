@@ -98,4 +98,52 @@
 
 =>
 	(printout t ?h" es un Hermano-Hermana de "?q crlf)
+)
+
+(defrule Primo-Prima
+	(declare (salience 40))
+	(or
+		(padre-de
+			(padre ?p)
+			(hijo ?h)
+		)
+		(madre-de
+			(madre ?p)
+			(hijo ?h)
+		)
 	)
+	(or
+		(padre-de
+			(padre ?h)
+			(hijo ?h1)
+		)
+		(madre-de
+			(madre ?h)
+			(hijo ?h1)
+		)
+	)
+	(or
+		(padre-de
+			(padre ?p)
+			(hijo  ?k & ~?h)
+		)
+		(madre-de
+			(madre ?p)
+			(hijo  ?k & ~?h)
+		)
+	)
+	(or
+		(padre-de
+			(padre ?k)
+			(hijo  ?z)
+		)
+		(madre-de
+			(madre ?k)
+			(hijo  ?z)
+		)
+	)
+
+
+=>
+	(printout t ?z" es un Primo-Prima de "?h1 crlf)
+)
