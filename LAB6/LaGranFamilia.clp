@@ -140,3 +140,44 @@
 	(printout t ?p" es un Abuelo-Abuela de "?h1 crlf)
 	(printout t ?q" es un Abuelo-Abuela de "?h1 crlf)
 )
+
+
+(defrule Abuelo-Abuela-pareja
+	(declare (salience 30))
+	(or
+		(padre-de
+			(padre ?p)
+			(hijo ?h)
+		)
+		(madre-de
+			(madre ?p)
+			(hijo ?h)
+		)
+	)
+	(or
+		(padre-de
+			(padre ?h)
+			(hijo ?h1)
+		)
+		(madre-de
+			(madre ?h)
+			(hijo ?h1)
+		)
+	)
+
+	(or
+		(padre-de
+			(padre ?p)
+			(hijo  ?k & ~?h)
+		)
+		(madre-de
+			(madre ?p)
+			(hijo  ?k & ~?h)
+		)
+	)
+	(or(hombre-de (esposo ?q)(esposa ?p ))(hombre-de (esposo ?p)(esposa ?q )))
+
+=>
+	(printout t ?p" es un Abuelo-Abuela y pareja de "?q crlf)
+	
+)
