@@ -25,34 +25,49 @@
 
 (defrule R1 
 	(declare (salience 30)) 
-	(persona
-		(nombre ?n)
+	(actividad
+		(ciudad ?n)
+		(duracion ?u)
 		
 	)
 	
-=> 
-	(assert (tiempo 0 ?n 0))) 	
 	
-(defrule R4 
-	(declare (salience 29)) 
-	?a <-(tiempo ?n ?u ?r) 
+	
+=> 
+	(assert (tiempo ?u ?n))
+
+) 
+(defrule R3 
+	(declare (salience 30)) 
 	(persona
 		(nombre ?n)
-		(ciudad ?m)
+		(ciudad ?k)
 		
 	)
-		(actividad
-		(ciudad ?m)
-		(duracion ?v)
-		
-	)
+	
+	
+	
 => 
-	(assert (tiempo ?n (+ ?u ?v) ( + ?r 1) ) )
+	(assert (media 0 ?n 0 ?k))
+
+) 
+
+(defrule R2
+	(declare (salience 20)) 
+	
+	 ?a <-(tiempo ?m ?n)
+	 ?d <-(media ?o ?j ?p  ?n)  	
+=> 
+	(assert (media (+ ?o ?m) ?j (+ 1 ?p) ?n))
 	(retract ?a)
-	) 
+	(retract ?d)
+	
+) 		
 	
 (defrule R5 
-	(declare (salience -29)) 
-	(tiempo ?n ?u ?r) 
+	(declare (salience 10)) 
+	(media ?n ?u ?r ?k) 
 => 
-	(printout t "La duración media de las actividades de "?n" es de "(/ ?u ?r) crlf)) 
+
+(printout t "La duración media de las actividades de "?u" es de "(/ ?n ?r) crlf)
+	) 
