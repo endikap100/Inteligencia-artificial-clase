@@ -172,19 +172,6 @@
 		)
 	)
 
-	(or
-		(padre-de
-			(padre ?p)
-			(hijo  ?k & ~?h)
-		)
-		(madre-de
-			(madre ?p)
-			(hijo  ?k & ~?h)
-		)
-	)
-	(or(hombre-de (esposo ?q)(esposa ?p ))(hombre-de (esposo ?p)(esposa ?q )))
-
 =>
 	(printout t ?p" es un Abuelo-Abuela de "?h1 crlf)
-	(printout t ?q" es un Abuelo-Abuela de "?h1 crlf)
 )
