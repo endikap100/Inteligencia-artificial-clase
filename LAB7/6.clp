@@ -3,10 +3,17 @@
 
 (defrule ordenar
   (declare (salience 50))
-  ?a <- (hecho1 $? ?x $?)
-  (not (hecho1 $? ?y &:(< ?y ?x )$?))
-
-  ;(not (hecho $? ?y &:(= ?y ?x )$?))
+  ?a <- (hecho1 $?b ?x $?c ?y $?d)
+	(test (> ?x ?y))
 =>
-    (assert (hecho2 ?x))
+	(retract ?a)
+	(assert (hecho1 (create$ $?b ?y $?c ?x $?d)))
+
+)
+
+(defrule Print
+  (declare (salience 0))
+	(hecho1 $?n)
+=>
+  (printout t "->"$?n crlf)
 )
