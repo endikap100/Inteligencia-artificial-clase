@@ -342,14 +342,14 @@
 
 	(assert (fichasMaquina (- ?nf 1)))
 	(retract ?f)
-	(assert (nivelComp 3))
+	(assert (nivelComp 50))
 )
 
 (defrule MAXMINGenArbol
 	(declare (salience 4))
 	?maxmin <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior)(tablero $?tablero) (color ?color) (nivel ?nivel)(hijos FALSE)(heuristico ?heuristico))
 	?ido <- (maxminidincremental ?idsiguiente)
-	(test (< ?nivel 3))
+	(test (< ?nivel 50))
 	(fichaJugador ?colorJugador)
 	?t <- (turno ?turno)
   (test (not(= 0 (str-compare ?colorJugador ?turno))))
@@ -401,7 +401,7 @@
 (defrule subirHeuristicoUnNivel
 	(declare (salience 2))
 	?maxminPadre <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior1)(tablero $?tablero1) (color ?color1) (nivel ?nivelPadre)(hijos ?hijos1)(heuristico ?heuristico1))
-	?maxminHijo <- (nivelMAXMIN (id ~ ?id) (idAnterior ?idAnterior2)(tablero $?tablero2) (color ?color2) (nivel ?nivelHijo)(hijos ?hijos2)(heuristico ?heuristico2 & ~?heuristico1))
+	?maxminHijo <- (nivelMAXMIN (id ~ ?id & ?idAnterior1) (idAnterior ?idAnterior2)(tablero $?tablero2) (color ?color2) (nivel ?nivelHijo)(hijos ?hijos2)(heuristico ?heuristico2 & ~?heuristico1))
 	?nivel <- (nivelComp ?nivelHijo)
 	(test (= ?nivelHijo (+ ?nivelPadre 1)))
 	(fichaJugador ?colorJugador)
@@ -445,15 +445,15 @@
 
 (defrule borrarBasuramaxmin
 	(declare (salience 10000))
-	?maxmin <- (nivelMAXMIN)
+	?maxmin <- (nivelMAXMIN (id ?id) )
 	(borrar TRUE)
 	=>
 	(retract ?maxmin)
 )
 
-(defrule borrarBasuramaxmin
+(defrule borrarBasuramaxminMaxminidincremental
 	(declare (salience 9999))
-	?maxmin <- (maxminidincremental)
+	?maxmin <- (maxminidincremental ?i)
 	?b <- (borrar TRUE)
 	=>
 	(retract ?maxmin)
