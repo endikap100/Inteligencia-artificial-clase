@@ -474,6 +474,7 @@
 )
 
 (defrule comprobarSiPuedeJugar
+	(declare (salience 10000))
 	?t <- (turno ?turno)
 	(tablero $?tablero)
 	=>
@@ -485,6 +486,7 @@
 				else
 					(bind ?turno  "Negra")
 			)
+			(retract ?t)
 			(assert (turno ?turno))
 			(if (eq FALSE (puedeMeter ?turno $?tablero))
 				then
@@ -494,6 +496,7 @@
 )
 
 (defrule sinFichas
+	(declare (salience 10000))
 	(fichasMaquina 0)
 	(fichasJugador 0)
 	=>
