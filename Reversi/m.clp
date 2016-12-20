@@ -372,8 +372,8 @@
 
 (defrule discriminacionPositivaNegativa
 	(declare (salience 3))
-	?maxmin1 <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior)(tablero $?tablero1) (color ?color) (nivel ?nivel)(heuristico ?heuristico1))
-	?maxmin2 <- (nivelMAXMIN (id ~ ?id) (idAnterior ?idAnterior)(tablero $?tablero2) (color ?color) (nivel ?nivel)(heuristico ?heuristico2))
+	?maxmin1 <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior)(tablero $?tablero1) (color ?color) (nivel ?nivel)(hijos ?hijos1)(heuristico ?heuristico1))
+	?maxmin2 <- (nivelMAXMIN (id ~ ?id) (idAnterior ?idAnterior)(tablero $?tablero2) (color ?color) (nivel ?nivel)(hijos ?hijos2)(heuristico ?heuristico2))
 	(nivelComp ?nivelComp)
 	(test (= ?nivelComp ?nivel) )
 	(fichaJugador ?colorJugador)
@@ -400,8 +400,8 @@
 
 (defrule subirHeuristicoUnNivel
 	(declare (salience 2))
-	?maxminPadre <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior1)(tablero $?tablero1) (color ?color1) (nivel ?nivelPadre)(heuristico ?heuristico1))
-	?maxminHijo <- (nivelMAXMIN (id ~ ?id) (idAnterior ?idAnterior2)(tablero $?tablero2) (color ?color2) (nivel ?nivelHijo)(heuristico ?heuristico2 & ~?heuristico1))
+	?maxminPadre <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior1)(tablero $?tablero1) (color ?color1) (nivel ?nivelPadre)(hijos ?hijos1)(heuristico ?heuristico1))
+	?maxminHijo <- (nivelMAXMIN (id ~ ?id) (idAnterior ?idAnterior2)(tablero $?tablero2) (color ?color2) (nivel ?nivelHijo)(hijos ?hijos2)(heuristico ?heuristico2 & ~?heuristico1))
 	?nivel <- (nivelComp ?nivelHijo)
 	(test (= ?nivelHijo (+ ?nivelPadre 1)))
 	(fichaJugador ?colorJugador)
@@ -409,7 +409,7 @@
   (test (not(= 0 (str-compare ?colorJugador ?turno))))
 	=>
 	(retract ?maxminPadre)
-	(assert (nivelMAXMIN (id ?id) (idAnterior ?idAnterior1)(tablero $?tablero1) (color ?color1) (nivel ?nivelPadre)(heuristico ?heuristico2)))
+	(assert (nivelMAXMIN (id ?id) (idAnterior ?idAnterior1)(tablero $?tablero1) (color ?color1) (nivel ?nivelPadre)(hijos ?hijos1)(heuristico ?heuristico2)))
 	(printout t "subirHeu: " ?id crlf)
 )
 
@@ -440,21 +440,21 @@
 	(retract ?t)
 	(retract ?a)
 	(retract ?nivel)
-	(assert (borrar))
+	(assert (borrar TRUE))
 )
 
 (defrule borrarBasuramaxmin
-	(declare (salience 1000))
+	(declare (salience 10000))
 	?maxmin <- (nivelMAXMIN)
-	(borrar)
+	(borrar TRUE)
 	=>
 	(retract ?maxmin)
 )
 
 (defrule borrarBasuramaxmin
-	(declare (salience 999))
+	(declare (salience 9999))
 	?maxmin <- (maxminidincremental)
-	?b <- (borrar)
+	?b <- (borrar TRUE)
 	=>
 	(retract ?maxmin)
 	(retract ?b)
