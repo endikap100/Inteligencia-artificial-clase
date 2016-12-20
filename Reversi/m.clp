@@ -329,8 +329,8 @@
 
 (defrule turnoMaquina
   (fichaJugador ?colorJugador)
-  ?t <- (turno ?turno)
   ?a <- (tablero $?tablero)
+	?t <- (turno ?turno)
   (test (not(= 0 (str-compare ?colorJugador ?turno))))
 	?f <- (fichasMaquina ?nf)
   =>
@@ -338,16 +338,19 @@
 	(assert (nivelMAXMIN (id 1) (idAnterior 0)(tablero $?tablero)(color (colorContrario (colorLetra ?colorJugador))) (nivel 1)(hijos FALSE)(heuristico (HeuristicoTabla (colorContrario (colorLetra ?colorJugador)) $?tablero))))
 	(assert (maxminidincremental 1))
 
-	(assert (fichasJugador (- ?nf 1)))
+	(assert (fichasMaquina (- ?nf 1)))
 	(retract ?f)
-	(assert (nivelComp 20))
+	(assert (nivelComp 3))
 )
 
 (defrule MAXMINGenArbol
+	(declare (salience 4))
 	?maxmin <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior)(tablero $?tablero) (color ?color) (nivel ?nivel)(hijos FALSE)(heuristico ?heuristico))
 	?ido <- (maxminidincremental ?idsiguiente)
-	(test (< ?nivel 20))
+	(test (< ?nivel 3))
 	(fichaJugador ?colorJugador)
+	?t <- (turno ?turno)
+  (test (not(= 0 (str-compare ?colorJugador ?turno))))
 	=>
 	(loop-for-count (?y 1 8) do
     (loop-for-count (?x 1 8) do
@@ -366,10 +369,14 @@
 )
 
 (defrule discriminacionPositivaNegativa
+	(declare (salience 3))
 	?maxmin1 <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior)(tablero $?tablero1) (color ?color) (nivel ?nivel)(heuristico ?heuristico1))
 	?maxmin2 <- (nivelMAXMIN (id ~ ?id) (idAnterior ?idAnterior)(tablero $?tablero2) (color ?color) (nivel ?nivel)(heuristico ?heuristico2))
 	(nivelComp ?nivelComp)
 	(test (= ?nivelComp ?nivel) )
+	(fichaJugador ?colorJugador)
+	?t <- (turno ?turno)
+  (test (not(= 0 (str-compare ?colorJugador ?turno))))
 	=>
 	(if (= 0 (mod ?nivel 2))
 		then ;discriminacionnegativa
@@ -387,4 +394,67 @@
 					(retract ?maxmin2)
 			)
 	)
+)
+
+(defrule subirHeuristicoUnNivel
+	(declare (salience 2))
+	?maxminPadre <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior1)(tablero $?tablero1) (color ?color1) (nivel ?nivelPadre)(heuristico ?heuristico1))
+	?maxminHijo <- (nivelMAXMIN (id ~ ?id) (idAnterior ?idAnterior2)(tablero $?tablero2) (color ?color2) (nivel ?nivelHijo)(heuristico ?heuristico2 & ~?heuristico1))
+	?nivel <- (nivelComp ?nivelHijo)
+	(test (= ?nivelHijo (+ ?nivelPadre 1)))
+	(fichaJugador ?colorJugador)
+	?t <- (turno ?turno)
+  (test (not(= 0 (str-compare ?colorJugador ?turno))))
+	=>
+	(retract ?maxminPadre)
+	(assert (nivelMAXMIN (id ?id) (idAnterior ?idAnterior1)(tablero $?tablero1) (color ?color1) (nivel ?nivelPadre)(heuristico ?heuristico2)))
+	(printout t "subirHeu: " ?id crlf)
+)
+
+(defrule subirNivel
+	(declare (salience 1))
+	?nivel <- (nivelComp ?nivelHijo)
+	(test (not (= 1 ?nivelHijo)))
+	(fichaJugador ?colorJugador)
+	?t <- (turno ?turno)
+  (test (not(= 0 (str-compare ?colorJugador ?turno))))
+	=>
+	(retract ?nivel)
+	(assert (nivelComp (- ?nivelHijo 1)))
+	(printout t ?nivelHijo)
+)
+
+(defrule aplicarJugada
+	(declare (salience 5))
+	?nivel <- (nivelComp 1)
+	?t <- (turno ?turno)
+  ?a <- (tablero $?tablero)
+	(fichaJugador ?colorJugador)
+  (test (not(= 0 (str-compare ?colorJugador ?turno))))
+	?maxmin <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior)(tablero $?tablero1) (color ?color) (nivel 2)(heuristico ?heuristico1))
+	=>
+	:(imprimirTablero $?tablero1)
+	(assert (turno ?colorJugador))
+	(assert (tablero $?tablero1))
+	(retract ?t)
+	(retract ?a)
+	(retract ?nivel)
+	(assert (borrar))
+)
+
+(defrule borrarBasuramaxmin
+	(declare (salience 1000))
+	?maxmin <- (nivelMAXMIN)
+	(borrar)
+	=>
+	(retract ?maxmin)
+)
+
+(defrule borrarBasuramaxmin
+	(declare (salience 999))
+	?maxmin <- (maxminidincremental)
+	?b <- (borrar)
+	=>
+	(retract ?maxmin)
+	(retract ?b)
 )
