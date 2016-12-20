@@ -45,12 +45,14 @@
 )
 
 (deffunction imprimirTablero ($?tablero)
+	(printout t crlf "Tablero:" crlf crlf)
   (loop-for-count (?y 1 8) do
     (loop-for-count (?x 1 8) do
       (printout t " "(getDeTablero ?x ?y $?tablero)" |" )
     )
     (printout t crlf "-------------------------------" crlf)
   )
+	(printout t crlf)
   ;(return)
 )
 
@@ -433,7 +435,6 @@
   (test (not(= 0 (str-compare ?colorJugador ?turno))))
 	?maxmin <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior)(tablero $?tablero1) (color ?color) (nivel 2)(heuristico ?heuristico1))
 	=>
-	:(imprimirTablero $?tablero1)
 	(assert (turno ?colorJugador))
 	(assert (tablero $?tablero1))
 	(retract ?t)
