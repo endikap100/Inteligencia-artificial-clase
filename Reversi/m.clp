@@ -272,6 +272,19 @@
 	)
 )
 
+(deffunction puedeMeter (?color $?tablero)
+	(loop-for-count (?y 1 8) do
+		(loop-for-count (?x 1 8) do
+			(bind ?insertado (insertarFicha ?x ?y (colorLetra ?color) $?tablero))
+			(if (not (eq ?insertado FALSE))
+				then
+					(return TRUE)
+			)
+		)
+	)
+	(return FALSE)
+)
+
 
 (defrule iniciar
 	(declare (salience 1000))
@@ -458,4 +471,46 @@
 	=>
 	(retract ?maxmin)
 	(retract ?b)
+)
+
+(defrule comprobarSiPuedeJugar
+	?t <- (turno ?turno)
+	(tablero $?tablero)
+	=>
+	(if (eq FALSE (puedeMeter ?turno $?tablero))
+		then
+			(if (= 0 (str-compare "Negra" ?turno))
+				then
+					(bind ?turno "Blanca")
+				else
+					(bind ?turno  "Negra")
+			)
+			(assert (turno ?turno))
+			(if (eq FALSE (puedeMeter ?turno $?tablero))
+				then
+					(assert (finalDeLaPartida TRUE))
+			)
+	)
+)
+
+(defrule sinFichas
+	(fichasMaquina 0)
+	(fichasJugador 0)
+	=>
+	(assert (finalDeLaPartida TRUE))
+)
+
+(defrule finalDeLaPartida
+	(declare (salience 10000))
+	(finalDeLaPartida TRUE)
+	(tablero $?tablero)
+	(fichaJugador ?color)
+	=>
+	(if (< 0 (HeuristicoTabla (colorLetra ?color) $?tablero))
+		then
+			(printout t crlf "El jugador gana!")
+		else
+			(printout t crlf "La maquina gana!")
+	)
+	(halt)
 )
