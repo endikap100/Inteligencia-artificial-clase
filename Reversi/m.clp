@@ -229,7 +229,7 @@
 					(bind ?posy (- ?y 2))
 					(while (and (<= ?posx 9)(>= ?posy 0)(eq (getDeTablero ?posx ?posy $?tablero) (colorContrario ?color)))
 						(bind ?posx (+ ?posx 1))
-						(bind ?posy (- 1 ?posy))
+						(bind ?posy (- ?posy 1))
 					)
 					(if (eq (getDeTablero ?posx ?posy $?tablero) ?color)
 						then
@@ -250,7 +250,7 @@
 					(bind ?posy (- ?y 2))
 					(while (and (>= ?posx 0)(>= ?posy 0)(eq (getDeTablero ?posx ?posy $?tablero) (colorContrario ?color)))
 						(bind ?posx (- ?posx 1))
-						(bind ?posy (- 1 ?posy))
+						(bind ?posy (- ?posy 1))
 					)
 					(if (eq (getDeTablero ?posx ?posy $?tablero) ?color)
 						then
@@ -355,14 +355,14 @@
 
 	(assert (fichasMaquina (- ?nf 1)))
 	(retract ?f)
-	(assert (nivelComp 50))
+	(assert (nivelComp 3))
 )
 
 (defrule MAXMINGenArbol
 	(declare (salience 4))
 	?maxmin <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior)(tablero $?tablero) (color ?color) (nivel ?nivel)(hijos FALSE)(heuristico ?heuristico))
 	?ido <- (maxminidincremental ?idsiguiente)
-	(test (< ?nivel 50))
+	(test (< ?nivel 3))
 	(fichaJugador ?colorJugador)
 	?t <- (turno ?turno)
   (test (not(= 0 (str-compare ?colorJugador ?turno))))
