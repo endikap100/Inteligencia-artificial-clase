@@ -13,7 +13,7 @@
   (fichasJugador 32)
   (turno "Negra")
 )
-;Plantilla del fact con el que se clacula maxmin
+;Plantilla del fact con el que se calcula maxmin
 (deftemplate nivelMAXMIN
 	(slot id)
 	(slot idAnterior)
