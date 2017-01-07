@@ -1,4 +1,7 @@
+;se define una variable gobal para facilitar el cambio de la catidad de niveles
 (defglobal ?*NIVELES* = 3)
+;
+;Deffacts para crear los hechos iniciales y estos den paso a las primeras reglas y empiece el juego.
 
 (deffacts hechos
 	(tablero  0 0 0 0 0 0 0 0
@@ -13,7 +16,7 @@
   (fichasJugador 32)
   (turno "Negra")
 )
-
+;Plantilla del fact con el que se calcula maxmin
 (deftemplate nivelMAXMIN
 	(slot id)
 	(slot idAnterior)
@@ -23,7 +26,7 @@
 	(slot hijos)
 	(slot heuristico)
 )
-
+;Funcioón para leer del teclado y comprobar que lo introducido es un Integer
 (deffunction leerInteger ()
   (bind ?i (read))
   (while (and (not(integerp ?i)) (<= ?i 8))
@@ -32,7 +35,7 @@
   )
   (return ?i)
 )
-
+;Funcion para coger una ficha del tablero dandole la fila, columna y tablero.
 (deffunction getDeTablero (?x ?y $?tablero)
 	(if (or (< ?x 1)(< ?y 1)(> ?x 8)(> ?y 8))
 		then
@@ -42,10 +45,11 @@
 	)
 )
 
+;Funcioón para insertar una ficha del color indicado en ?ficha en las posiciones dadas previamente en el ?tablero
 (deffunction insertEnTablero (?x ?y ?ficha $?tablero)
   (return (replace$ $?tablero (+(*(- ?y 1) 8) ?x)(+(*(- ?y 1) 8) ?x) ?ficha ))
 )
-
+;Cogiendo un tablero como elemento lo imprime en la pantalla de forma que se pueda jugar al reversi
 (deffunction imprimirTablero ($?tablero)
 	(printout t crlf "Tablero:" crlf crlf)
   (loop-for-count (?y 1 8) do
@@ -58,7 +62,7 @@
 	(printout t crlf $?tablero crlf)
   ;(return)
 )
-
+;Devuelve la inicial del color contrario pasado en ?a
 (deffunction colorContrario (?a)
 	(if (eq ?a N)
 		then
@@ -72,7 +76,7 @@
 			)
 	)
 )
-
+;?a sienso "Blanca" o "Negra", devuelve su inicial
 (deffunction colorLetra (?a)
 	(if (= 0 (str-compare ?a "Blanca"))
 		then
@@ -87,7 +91,8 @@
 
 	)
 )
-
+;Función que calcula el heuristico
+;Dando un color y un tablero calcula el numero de fichas de ese color y le resta las del color contrario.
 (deffunction HeuristicoTabla (?color $?tablero)
 	(bind ?heuristico 0)
 	(progn$ (?ficha $?tablero)
@@ -104,13 +109,16 @@
 	(return ?heuristico)
 )
 
+;Devuelve un tablero modificado, añadiendo la ficha en las posiciones ?y ?x en el ?tableroOriginal
 (deffunction insertarFicha (?x ?y ?color $?tableroOriginal)
 	(bind $?tablero $?tableroOriginal)
-	(if (not (eq (getDeTablero ?x ?y $?tablero) 0))
+
+	(if (not (eq (getDeTablero ?x ?y $?tablero) 0)) ;Primero comprueba que en las coordenadas hay un espacio en blanco
 		then
 			(return FALSE)
-		else
-			;derecha x++
+		else	;En caso de que el espacio este vacio, la función mirara las 8 posiciones que rodean ?x ?y
+			;para comprobar si es posible colocar la ficha, y en caso de que lo sea y se requiera, cambiar las fichas para poder ejecutar la jugada.
+		;derecha x++
 			;(printout t "derecha" crlf)
 			(if (and (<= ?x 8)(eq (getDeTablero (+ ?x 1) ?y $?tablero) (colorContrario ?color)))
 				then
@@ -274,7 +282,7 @@
 			)
 	)
 )
-
+;Funcion que comprueba que el ?color puede jugar
 (deffunction puedeMeter (?color $?tablero)
 	(loop-for-count (?y 1 8) do
 		(loop-for-count (?x 1 8) do
@@ -288,14 +296,14 @@
 	(return FALSE)
 )
 
-
+;Regla inicial que inicializa el juego
 (defrule iniciar
 	(declare (salience 10000))
   (tablero $?tablero)
   =>
   (imprimirTablero $?tablero)
 )
-
+;Funcion que se usa al inicio de la ejecución y elige el color de los jugadores
 (defrule elegirTurno
   (declare (salience 100))
   (initial-fact)
@@ -307,7 +315,7 @@
   )
   (assert (fichaJugador ?lee))
 )
-
+;Regla que define el turno del jugador humano
 (defrule turnoPersona
   (fichaJugador ?colorJugador)
   ?t <- (turno ?turno)
@@ -345,6 +353,7 @@
   (retract ?t)
 )
 
+;Regla que establece el turno de la maquina
 (defrule turnoMaquina
   (fichaJugador ?colorJugador)
   ?a <- (tablero $?tablero)
@@ -352,20 +361,21 @@
   (test (not(= 0 (str-compare ?colorJugador ?turno))))
 	?f <- (fichasMaquina ?nf)
   =>
-	;(printout t "no hace ni mierdas")
+
 	(assert (nivelMAXMIN (id 1) (idAnterior 0)(tablero $?tablero)(color (colorContrario (colorLetra ?colorJugador))) (nivel 1)(hijos FALSE)(heuristico (HeuristicoTabla (colorContrario (colorLetra ?colorJugador)) $?tablero))))
 	(assert (maxminidincremental 1))
 
 	(assert (fichasMaquina (- ?nf 1)))
 	(retract ?f)
-	(assert (nivelComp ?*NIVELES*))
+	(assert (nivelComp ?*NIVELES*)) ; En este apartado se puede elegir la profundidad del arbol
 )
-
+;Regla con la que se genera el arbol maxmin
+;Teniendo un fact nivelMAXMIN crea sus hijos (Jugadas posibles)
 (defrule MAXMINGenArbol
 	(declare (salience 4))
 	?maxmin <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior)(tablero $?tablero) (color ?color) (nivel ?nivel)(hijos FALSE)(heuristico ?heuristico))
 	?ido <- (maxminidincremental ?idsiguiente)
-	(test (< ?nivel ?*NIVELES*))
+	(test (< ?nivel ?*NIVELES*)) ; En este apartado se puede elegir la profundidad del arbol
 	(fichaJugador ?colorJugador)
 	?t <- (turno ?turno)
   (test (not(= 0 (str-compare ?colorJugador ?turno))))
@@ -386,6 +396,7 @@
 	(retract ?ido)
 )
 
+;Regla que se ejecuta cuando el arbol esta creado y elige el minimo o el maximo dependiendo de el nivel de los facts
 (defrule discriminacionPositivaNegativa
 	(declare (salience 3))
 	?maxmin1 <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior)(tablero $?tablero1) (color ?color) (nivel ?nivel)(hijos ?hijos1)(heuristico ?heuristico1))
@@ -414,6 +425,7 @@
 	)
 )
 
+;Una vez terminado de discriminar los facts de un nivel se sube de nivel para ir acotando la jugada que se busca
 (defrule subirHeuristicoUnNivel
 	(declare (salience 2))
 	?maxminPadre <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior1)(tablero $?tablero1) (color ?color1) (nivel ?nivelPadre)(hijos ?hijos1)(heuristico ?heuristico1))
@@ -441,7 +453,7 @@
 	(assert (nivelComp (- ?nivelHijo 1)))
 	(printout t ?nivelHijo)
 )
-
+;Aplica la jugada indicada
 (defrule aplicarJugada
 	(declare (salience 5))
 	?nivel <- (nivelComp 1)
@@ -458,7 +470,7 @@
 	(retract ?nivel)
 	(assert (borrar TRUE))
 )
-
+;Regla que borra todos los facts restantes del arbol maxmin una vez hecha la jugada
 (defrule borrarBasuramaxmin
 	(declare (salience 10000))
 	?maxmin <- (nivelMAXMIN (id ?id) )
@@ -466,7 +478,7 @@
 	=>
 	(retract ?maxmin)
 )
-
+;Regla que borra todos los facts restantes del arbol maxmin una vez hecha la jugada
 (defrule borrarBasuramaxminMaxminidincremental
 	(declare (salience 9999))
 	?maxmin <- (maxminidincremental ?i)
@@ -475,7 +487,8 @@
 	(retract ?maxmin)
 	(retract ?b)
 )
-
+;Regla que comprueba si el jugador que tiene el turno puede jugar
+;En caso de que ninguno de los dos pueda, se termina la partida.
 (defrule comprobarSiPuedeJugar
 	(declare (salience 10000))
 	?t <- (turno ?turno)
@@ -497,7 +510,7 @@
 			)
 	)
 )
-
+;Regla que comprueba que el numero de fichas es superior a 0 en caso contrario se termina el juego
 (defrule sinFichas
 	(declare (salience 10000))
 	(fichasMaquina 0)
@@ -505,7 +518,8 @@
 	=>
 	(assert (finalDeLaPartida TRUE))
 )
-
+;Regla que define el final del juego.
+;Solo se ejecutara si los jugadores estan sin fichas o ninguno puede mover
 (defrule finalDeLaPartida
 	(declare (salience 10000))
 	(finalDeLaPartida TRUE)
