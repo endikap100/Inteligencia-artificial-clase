@@ -1,3 +1,5 @@
+(defglobal ?*NIVELES* = 3)
+
 (deffacts hechos
 	(tablero  0 0 0 0 0 0 0 0
             0 0 0 0 0 0 0 0
@@ -53,6 +55,7 @@
     (printout t crlf "-------------------------------" crlf)
   )
 	(printout t crlf)
+	(printout t crlf $?tablero crlf)
   ;(return)
 )
 
@@ -287,7 +290,7 @@
 
 
 (defrule iniciar
-	(declare (salience 1000))
+	(declare (salience 10000))
   (tablero $?tablero)
   =>
   (imprimirTablero $?tablero)
@@ -355,14 +358,14 @@
 
 	(assert (fichasMaquina (- ?nf 1)))
 	(retract ?f)
-	(assert (nivelComp 3))
+	(assert (nivelComp ?*NIVELES*))
 )
 
 (defrule MAXMINGenArbol
 	(declare (salience 4))
 	?maxmin <- (nivelMAXMIN (id ?id) (idAnterior ?idAnterior)(tablero $?tablero) (color ?color) (nivel ?nivel)(hijos FALSE)(heuristico ?heuristico))
 	?ido <- (maxminidincremental ?idsiguiente)
-	(test (< ?nivel 3))
+	(test (< ?nivel ?*NIVELES*))
 	(fichaJugador ?colorJugador)
 	?t <- (turno ?turno)
   (test (not(= 0 (str-compare ?colorJugador ?turno))))
